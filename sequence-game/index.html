@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequence Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sequence Game</h1>
+        <div id="game-info">
+            <p>Time: <span id="time">60</span>s</p>
+            <p>Stage: <span id="stage">1</span></p>
+        </div>
+        <div id="game-board"></div>
+        <button id="start-btn" onclick="startGame()">Start Game</button>
+        <button id="submit-btn" onclick="submitSequence()" style="display: none;">Submit</button>
+        <p id="result-message"></p>
+    </div>
+
+    <!-- Modal for stage completion -->
+    <div id="stage-complete-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p id="modal-text"></p>
+            <button id="next-stage-btn" onclick="nextStage()">Next Stage</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

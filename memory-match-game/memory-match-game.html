@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match Game with Timer & Points</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 320px;
+            gap: 10px;
+        }
+        .card {
+            width: 70px;
+            height: 70px;
+            background-color: #007bff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .card.hidden {
+            background-color: #28a745;
+        }
+        .card.matched {
+            background-color: #6c757d;
+            cursor: default;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        #score, #timer {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        #controls {
+            display: flex;
+            justify-content: space-between;
+            width: 320px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div>
+        <h1>Memory Match Game</h1>
+        <div id="controls">
+ 	    <div><button id="resetButton">Reset Game</button></div>
+	    <div id="timer">Time Left: 60s</div>
+<div id="score">Score: 0</div>
+        </div>
+        <div class="game-container" id="gameBoard"></div>
+    </div>
+
+    <script>
+        const cardsArray = [
+            { name: 'A', matched: false },
+            { name: 'B', matched: false },
+            { name: 'C', matched: false },
+            { name: 'D', matched: false },
+            { name: 'E', matched: false },
+            { name: 'F', matched: false },
+            { name: 'A', matched: false },
+            { name: 'B', matched: false },
+            { name: 'C', matched: false },
+            { name: 'D', matched: false },
+            { name: 'E', matched: false },
+            { name: 'F', matched: false }
+        ];
+
+        const gameBoard = document.getElementById('gameBoard');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+        const resetButton = document.getElementById('resetButton');
+
+        let firstCard = null;
+        let secondCard = null;
+        let lockBoard = false;
+        let matchedCount = 0;
+        let score = 0;
+        let timeLeft = 60;
+        let countdownInterval;
+
+        // Shuffle cards
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Create and display cards
+        function createBoard() {
+            shuffle(cardsArray);
+            gameBoard.innerHTML = '';
+            cardsArray.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card');
+                cardElement.dataset.name = card.name;
+                cardElement.dataset.index = index;
+                cardElement.addEventListener('click', handleCardClick);
+                gameBoard.appendChild(cardElement);
+            });
+        }
+
+        // Handle card click
+        function handleCardClick() {
+            if (lockBoard || timeLeft === 0) return;
+            if (this === firstCard) return;
+
+            this.classList.add('hidden');
+            this.textContent = this.dataset.name;
+
+            if (!firstCard) {
+                firstCard = this;
+                return;
+            }
+
+            secondCard = this;
+            lockBoard = true;
+
+            checkForMatch();
+        }
+
+        // Check for a match
+        function checkForMatch() {
+            const isMatch = firstCard.dataset.name === secondCard.dataset.name;
+
+            if (isMatch) {
+                disableCards();
+            } else {
+                unflipCards();
+            }
+        }
+
+        // Disable matched cards
+        function disableCards() {
+            firstCard.removeEventListener('click', handleCardClick);
+            secondCard.removeEventListener('click', handleCardClick);
+            firstCard.classList.add('matched');
+            secondCard.classList.add('matched');
+            resetBoard();
+
+            score += 10; // Add points for each correct match
+            matchedCount += 2;
+            scoreDisplay.textContent = `Score: ${score}`;
+
+            if (matchedCount === cardsArray.length) {
+                setTimeout(() => alert('Congratulations! You matched all the cards!'), 500);
+                clearInterval(countdownInterval); // Stop the timer when game is won
+            }
+        }
+
+        // Unflip cards if not matched
+        function unflipCards() {
+            setTimeout(() => {
+                firstCard.classList.remove('hidden');
+                secondCard.classList.remove('hidden');
+                firstCard.textContent = '';
+                secondCard.textContent = '';
+                resetBoard();
+            }, 1000);
+        }
+
+        // Reset board
+        function resetBoard() {
+            [firstCard, secondCard, lockBoard] = [null, null, false];
+        }
+
+        // Start the countdown timer
+        function startTimer() {
+            timeLeft = 60;
+            timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+
+                if (timeLeft === 0) {
+                    clearInterval(countdownInterval);
+                    alert('Time is up! Your final score is ' + score);
+                    disableAllCards();
+                }
+            }, 1000);
+        }
+
+        // Disable all cards when time runs out
+        function disableAllCards() {
+            document.querySelectorAll('.card').forEach(card => {
+                card.removeEventListener('click', handleCardClick);
+            });
+        }
+
+        // Reset the game
+        function resetGame() {
+            clearInterval(countdownInterval);
+            score = 0;
+            matchedCount = 0;
+            scoreDisplay.textContent = 'Score: 0';
+            startTimer();
+            createBoard();
+        }
+
+        // Add event listener to reset button
+        resetButton.addEventListener('click', resetGame);
+
+        // Initialize the game
+        createBoard();
+        startTimer();
+    </script>
+
+</body>
+</html>
