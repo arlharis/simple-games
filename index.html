@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 80%;
+            max-width: 1000px;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        a {
+            text-decoration: none;
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <a href="/home/arlharis/Desktop/simple-games/memory-match-game/memory-match-game.html">Card 1 - Game 1</a>
+        </div>
+        <div class="card">
+            <a href="/home/arlharis/Desktop/simple-games/mind-challenge-game/index.html">Card 2 - Game 2</a>
+        </div>
+        <div class="card">
+            <a href="/home/arlharis/Desktop/simple-games/sequence-game/index.html">Card 3 - Game 3</a>
+        </div>
+        <div class="card">
+            <a href="/game4/index.html">Card 4 - Game 4</a>
+        </div>
+    </div>
+</body>
+</html>
