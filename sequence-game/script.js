@@ -16,9 +16,10 @@ function startGame() {
 }
 
 function resetGame() {
+    clearInterval(timer);  // Stop any running timers
     document.getElementById("result-message").innerText = "";
     document.getElementById("game-board").innerHTML = "";
-    timeRemaining = 60;
+    timeRemaining = 60;  // Reset time to full
     stage = 1;
     correctClicks = 0;
     playerClicks = [];
@@ -26,9 +27,10 @@ function resetGame() {
 }
 
 function startStage(stage) {
-    sequence = generateSequence(stage);
-    shuffleArray(sequence);
-    displayBlocks(sequence);
+    sequence = generateSequence(stage);  // Generate sequence
+    const shuffledSequence = [...sequence]; // Copy sequence
+    shuffleArray(shuffledSequence);  // Shuffle the copied sequence for display
+    displayBlocks(shuffledSequence); // Display blocks in random order
     correctClicks = 0;
     playerClicks = [];
 }
@@ -36,23 +38,23 @@ function startStage(stage) {
 function generateSequence(stage) {
     let numbers = [];
     if (stage === 1) {
-        numbers = Array.from({ length: 12 }, (_, i) => i + 1);
+        numbers = Array.from({ length: 12 }, (_, i) => i + 1);  // 1-12
     } else if (stage === 2) {
-        numbers = Array.from({ length: 12 }, (_, i) => i + 13);
+        numbers = Array.from({ length: 12 }, (_, i) => i + 13);  // 13-24
     } else if (stage === 3) {
         numbers = Array.from({ length: 12 }, (_, i) => String.fromCharCode(i + 65)); // A-L
     } else if (stage === 4) {
         numbers = Array.from({ length: 12 }, (_, i) => String.fromCharCode(i + 77)); // M-X
     } else if (stage === 5) {
-        numbers = Array.from({ length: 12 }, (_, i) => i + 25);
+        numbers = Array.from({ length: 12 }, (_, i) => i + 25);  // 25-36
     }
-    return numbers;
+    return numbers;  // Return the correct sequence (1, 2, 3, ...)
 }
 
-function displayBlocks(sequence) {
+function displayBlocks(shuffledSequence) {
     const gameBoard = document.getElementById("game-board");
     gameBoard.innerHTML = "";
-    sequence.forEach((num, index) => {
+    shuffledSequence.forEach((num) => {
         const block = document.createElement("div");
         block.classList.add("game-block");
         block.innerText = num;
@@ -62,18 +64,23 @@ function displayBlocks(sequence) {
 }
 
 function handleClick(block, value) {
-    if (!isGameRunning) return;
+    if (!isGameRunning || block.classList.contains("correct")) return;  // Ensure block can be clicked only once
 
-    const expectedValue = sequence[correctClicks];
+    const expectedValue = sequence[correctClicks];  // Get the expected value in ascending order from original sequence
+
     if (value === expectedValue) {
         correctClicks++;
         block.classList.add("correct");
         playerClicks.push(value);
     } else {
-        timeRemaining--; // Deduct time for incorrect click
+        timeRemaining = Math.max(0, timeRemaining - 1);  // Deduct time but prevent negative time
     }
 
     updateGameInfo();
+
+    if (correctClicks === sequence.length) {
+        document.getElementById("submit-btn").style.display = "inline-block";
+    }
 }
 
 function submitSequence() {
@@ -117,7 +124,9 @@ function nextStage() {
     if (stage > 5) {
         endGame("Congratulations, you won!");
     } else {
+        clearInterval(timer);  // Clear previous timer before starting new stage
         startStage(stage);
+        startTimer(timeRemaining);  // Start timer for the new stage
     }
     updateGameInfo();
 }
@@ -128,6 +137,7 @@ function updateGameInfo() {
 }
 
 function startTimer(seconds) {
+    clearInterval(timer);  // Clear any previous timers
     timer = setInterval(() => {
         seconds--;
         timeRemaining = seconds;
@@ -147,7 +157,7 @@ function shuffleArray(array) {
 }
 
 function endGame(message) {
-    clearInterval(timer);
+    clearInterval(timer);  // Stop the timer when the game ends
     isGameRunning = false;
     document.getElementById("submit-btn").style.display = "none";
     document.getElementById("result-message").innerText = message;
